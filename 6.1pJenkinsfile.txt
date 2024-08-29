@@ -5,6 +5,7 @@ pipeline {
         DIRECTORY_PATH = '/Users/macbook1/Desktop/Code/JS code'
         TESTING_ENVIRONMENT = 'test-env'
         PRODUCTION_ENVIRONMENT = 'Nonefornow'
+        EMAIL_RECIPIENT = 'your-email@example.com' // Add your email address here
     }
 
     stages {
@@ -18,35 +19,79 @@ pipeline {
         }
         stage('Build') {
             steps {
-                echo 'Running build steps...'
-                // Add your build steps here
+                script {
+                    echo 'Running build steps...'
+                    // Example: sh 'mvn clean install' for Maven
+                }
             }
         }
-        stage('Test') {
+        stage('Unit and Integration Tests') {
             steps {
-                echo "Running unit tests"
-                echo "Running integration tests"
+                script {
+                    echo 'Running unit tests...'
+                    // Example: sh 'npm test' for JavaScript projects
+                    echo 'Running integration tests...'
+                    // Example: sh 'npm run integration-test'
+                }
             }
         }
-        stage('Code Quality Check') {
+        stage('Code Analysis') {
             steps {
-                echo "Checking the quality of the code"
+                script {
+                    echo 'Analyzing code quality...'
+                    // Example: sh 'sonar-scanner' for SonarQube
+                }
             }
         }
-        stage('Deploy') {
+        stage('Security Scan') {
             steps {
-                echo "Deploying to testing environment: ${env.TESTING_ENVIRONMENT}"
+                script {
+                    echo 'Performing security scan...'
+                    // Example: sh 'dependency-check.sh' for OWASP Dependency-Check
+                }
             }
         }
-        stage('Approval') {
+        stage('Deploy to Staging') {
             steps {
-                echo "Waiting for manual approval..."
-                sleep time: 10, unit: 'SECONDS'
+                script {
+                    echo 'Deploying to testing environment: ${env.TESTING_ENVIRONMENT}'
+                    // Example: sh 'deploy-to-staging.sh'
+                }
+            }
+        }
+        stage('Integration Tests on Staging') {
+            steps {
+                script {
+                    echo 'Running integration tests on staging...'
+                    // Example: sh 'npm run integration-test-staging'
+                }
             }
         }
         stage('Deploy to Production') {
             steps {
-                echo "Deploying to production environment: ${env.PRODUCTION_ENVIRONMENT}"
+                script {
+                    echo 'Deploying to production environment: ${env.PRODUCTION_ENVIRONMENT}'
+                    // Example: sh 'deploy-to-production.sh'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            script {
+                echo 'Pipeline succeeded!'
+            }
+        }
+        failure {
+            script {
+                echo 'Pipeline failed!'
+                emailext (
+                    to: "${env.EMAIL_RECIPIENT}",
+                    subject: "Jenkins Pipeline Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                    body: "The pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} failed.\n\nCheck the Jenkins job for more details.",
+                    attachLog: true
+                )
             }
         }
     }
