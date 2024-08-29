@@ -8,10 +8,18 @@ pipeline {
     }
 
     stages {
+        stage('Delay') {
+            steps {
+                script {
+                    echo 'Waiting for a short delay...'
+                    sleep(time: 1, unit: 'MINUTES')  
+                }
+            }
+        }
         stage('Build') {
             steps {
-                echo "Fetching the source code from directory path: ${env.DIRECTORY_PATH}"
-                echo "Compiling the code and generating artifacts"
+                echo 'Running build steps...'
+                // Add your build steps here
             }
         }
         stage('Test') {
