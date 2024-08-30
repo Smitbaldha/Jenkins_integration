@@ -1,78 +1,56 @@
-pipeline {
+pipeline{
     agent any
 
-    environment {
-        DIRECTORY_PATH = '/Users/macbook1/Desktop/Code/JS code'
-        TESTING_ENVIRONMENT = 'test-env'
-        PRODUCTION_ENVIRONMENT = 'Nonefornow'
-        EMAIL_RECIPIENTS = 'baldhasmit@gmail.com'
-    }
+    stages{
+        stage('Build'){
+            steps {
+                // BUild the code using Maven or another build automation tool
+                echo "Buld Stage"
+            }
+        }
+        stage('Unit and Integration Tests'){
+            steps {
+                // Run unit tests using JUnit or another test automation tool
+                // Run integration tests using Selenium or another integration testing tool
+                echo "Testing Stage"
+            }
+        }
+        stage('Code Analysis'){
+            steps {
+                // Integrate a code analysis tools like SoanrQube or checkstyle
+                echo "Code Analysis Stage"
+            }
+        }
+        stage('Security Scan'){
+            steps {
+                // Perform a security scan using tools like OWASP ZAP or SonarQube
+                echo "Security Stage"
+            }
+        }
+        stage('Deploy to Staging'){
+            steps{
+                // Deploy the application to a staging server, e.g., AWS EC2 instance
+                echo "Deployment Stage"
+            }
+        }
+        stage('Integration tests on Staging'){
+            steps {
+                // Run integration tests on the staging environment
+                echo "Integration Stage"
+            }
+        }
+        stage('Deploy to Production'){
+            steps {
+                // Depoy the application to a production server, e.g., AWS EC2 instance
+                echo "Production Stage"
+            }
 
-    stages {
-        stage('Delay') {
-            steps {
-                script {
-                    echo 'Waiting for a short delay...'
-                    sleep(time: 1, unit: 'MINUTES')  
-                }
-            }
-        }
-        stage('Build') {
-            steps {
-                echo 'Running build steps...'
-                // Add your build steps here
-            }
-        }
-        stage('Test') {
-            steps {
-                echo "Running unit tests"
-                echo "Running integration tests"
-            }
             post {
-                always {
-                    script {
-                        emailext subject: "Test Stage Result: ${currentBuild.currentResult}",
-                                 body: "Test stage completed with status: ${currentBuild.currentResult}. Please check the attached logs.",
-                                 to: env.EMAIL_RECIPIENTS,
-                                 attachLog: true
-                    }
+                success {                    
+                        mail to: 'bhanusinghthakur1002@gmail.com',
+                        subject: 'Deployment Successful',
+                        body: 'The deployment was successful'
                 }
-            }
-        }
-        stage('Code Quality Check') {
-            steps {
-                echo "Checking the quality of the code"
-            }
-        }
-        stage('Security Scan') {
-            steps {
-                echo "Performing security scan"
-            }
-            post {
-                always {
-                    script {
-                        emailext subject: "Security Scan Result: ${currentBuild.currentResult}",
-                                 body: "Security scan completed with status: ${currentBuild.currentResult}. Please check the attached logs.",
-                                 to: env.EMAIL_RECIPIENTS,
-                                 attachLog: true
-                    }
-                }
-            }
-        }
-        stage('Deploy') {
-            steps {
-                echo "Deploying to testing environment: ${env.TESTING_ENVIRONMENT}"
-            }
-        }
-        stage('Approval') {
-            steps {
-                echo "Waiting for manual approval..."
-                sleep time: 10, unit: 'SECONDS'
-            }
-        }
-        stage('Deploy to Production') {
-            steps {
-                echo "Deploying to production environment: ${env.PRODUCTION_ENVIRONMENT}"
             }
         }
     }
