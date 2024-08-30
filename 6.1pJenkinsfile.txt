@@ -14,7 +14,7 @@ pipeline {
             post {
                 always {
                     script {
-                        def log = currentBuild.rawBuild.getLog(100).join("\n")
+                        def log = currentBuild.getLog(100).join("\n")
                         def status = currentBuild.currentResult
                         mail to: 'baldhasmit@gmail.com',
                              subject: "Unit and Integration Tests: ${status}",
@@ -36,7 +36,7 @@ pipeline {
             post {
                 always {
                     script {
-                        def log = currentBuild.rawBuild.getLog(100).join("\n")
+                        def log = currentBuild.getLog(100).join("\n")
                         def status = currentBuild.currentResult
                         mail to: 'baldhasmit@gmail.com',
                              subject: "Security Scan: ${status}",
