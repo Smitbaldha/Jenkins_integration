@@ -5,7 +5,7 @@ pipeline {
         DIRECTORY_PATH = '/Users/macbook1/Desktop/Code/JS code'
         TESTING_ENVIRONMENT = 'test-env'
         PRODUCTION_ENVIRONMENT = 'Nonefornow'
-        EMAIL_RECIPIENT = 'your-email@example.com' // Add your email address here
+        EMAIL_RECIPIENTS = 'baldhasmit@gmail.com'
     }
 
     stages {
@@ -19,79 +19,60 @@ pipeline {
         }
         stage('Build') {
             steps {
-                script {
-                    echo 'Running build steps...'
-                    // Example: sh 'mvn clean install' for Maven
+                echo 'Running build steps...'
+                // Add your build steps here
+            }
+        }
+        stage('Test') {
+            steps {
+                echo "Running unit tests"
+                echo "Running integration tests"
+            }
+            post {
+                always {
+                    script {
+                        emailext subject: "Test Stage Result: ${currentBuild.currentResult}",
+                                 body: "Test stage completed with status: ${currentBuild.currentResult}. Please check the attached logs.",
+                                 to: env.EMAIL_RECIPIENTS,
+                                 attachLog: true
+                    }
                 }
             }
         }
-        stage('Unit and Integration Tests') {
+        stage('Code Quality Check') {
             steps {
-                script {
-                    echo 'Running unit tests...'
-                    // Example: sh 'npm test' for JavaScript projects
-                    echo 'Running integration tests...'
-                    // Example: sh 'npm run integration-test'
-                }
-            }
-        }
-        stage('Code Analysis') {
-            steps {
-                script {
-                    echo 'Analyzing code quality...'
-                    // Example: sh 'sonar-scanner' for SonarQube
-                }
+                echo "Checking the quality of the code"
             }
         }
         stage('Security Scan') {
             steps {
-                script {
-                    echo 'Performing security scan...'
-                    // Example: sh 'dependency-check.sh' for OWASP Dependency-Check
+                echo "Performing security scan"
+            }
+            post {
+                always {
+                    script {
+                        emailext subject: "Security Scan Result: ${currentBuild.currentResult}",
+                                 body: "Security scan completed with status: ${currentBuild.currentResult}. Please check the attached logs.",
+                                 to: env.EMAIL_RECIPIENTS,
+                                 attachLog: true
+                    }
                 }
             }
         }
-        stage('Deploy to Staging') {
+        stage('Deploy') {
             steps {
-                script {
-                    echo 'Deploying to testing environment: ${env.TESTING_ENVIRONMENT}'
-                    // Example: sh 'deploy-to-staging.sh'
-                }
+                echo "Deploying to testing environment: ${env.TESTING_ENVIRONMENT}"
             }
         }
-        stage('Integration Tests on Staging') {
+        stage('Approval') {
             steps {
-                script {
-                    echo 'Running integration tests on staging...'
-                    // Example: sh 'npm run integration-test-staging'
-                }
+                echo "Waiting for manual approval..."
+                sleep time: 10, unit: 'SECONDS'
             }
         }
         stage('Deploy to Production') {
             steps {
-                script {
-                    echo 'Deploying to production environment: ${env.PRODUCTION_ENVIRONMENT}'
-                    // Example: sh 'deploy-to-production.sh'
-                }
-            }
-        }
-    }
-
-    post {
-        success {
-            script {
-                echo 'Pipeline succeeded!'
-            }
-        }
-        failure {
-            script {
-                echo 'Pipeline failed!'
-                emailext (
-                    to: "${env.EMAIL_RECIPIENT}",
-                    subject: "Jenkins Pipeline Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                    body: "The pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} failed.\n\nCheck the Jenkins job for more details.",
-                    attachLog: true
-                )
+                echo "Deploying to production environment: ${env.PRODUCTION_ENVIRONMENT}"
             }
         }
     }
