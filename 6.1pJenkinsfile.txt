@@ -1,72 +1,74 @@
 pipeline {
-    agent any
+  agent any
 
-    stages {
-        stage('Build') {
-            steps {
-                echo "Build Stage"
-            }
-        }
-        stage('Unit and Integration Tests') {
-            steps {
-                echo "Testing Stage"
-            }
-            post {
-                always {
-                    script {
-                        def log = currentBuild.getLog(100).join("\n")
-                        def status = currentBuild.currentResult
-                        mail to: 'baldhasmit@gmail.com',
-                             subject: "Unit and Integration Tests: ${status}",
-                             body: "The Unit and Integration Tests stage has ${status}. Logs are attached.",
-                             attachmentsPattern: log
-                    }
-                }
-            }
-        }
-        stage('Code Analysis') {
-            steps {
-                echo "Code Analysis Stage"
-            }
-        }
-        stage('Security Scan') {
-            steps {
-                echo "Security Stage"
-            }
-            post {
-                always {
-                    script {
-                        def log = currentBuild.getLog(100).join("\n")
-                        def status = currentBuild.currentResult
-                        mail to: 'baldhasmit@gmail.com',
-                             subject: "Security Scan: ${status}",
-                             body: "The Security Scan stage has ${status}. Logs are attached.",
-                             attachmentsPattern: log
-                    }
-                }
-            }
-        }
-        stage('Deploy to Staging') {
-            steps {
-                echo "Deployment Stage"
-            }
-        }
-        stage('Integration tests on Staging') {
-            steps {
-                echo "Integration Stage"
-            }
-        }
-        stage('Deploy to Production') {
-            steps {
-                echo "Production Stage"
-            }
-            post {
-                success {
-                    mail to: 'baldhasmit@gmail.com',
-                         subject: 'Deployment Successful',
-                         body: 'The deployment was successful'
-                }
-            }
-        }
+  stages {
+    stage('Build') {
+      steps {
+        echo "Build Stage"
+      }
     }
+    stage('Unit and Integration Tests') {
+      steps {
+        echo "Testing Stage"
+      }
+      post {
+        always {
+          script {
+            // Capture the entire build log using sh command
+            def log = sh(script: 'cat /path/to/build.log', returnStdout: true)
+            def status = currentBuild.currentResult
+            mail to: 'baldhasmit@gmail.com',
+                 subject: "Unit and Integration Tests: ${status}",
+                 body: "The Unit and Integration Tests stage has ${status}. Logs are attached.",
+                 attachmentsPattern: 'log'
+          }
+        }
+      }
+    }
+    stage('Code Analysis') {
+      steps {
+        echo "Code Analysis Stage"
+      }
+    }
+    stage('Security Scan') {
+      steps {
+        echo "Security Stage"
+      }
+      post {
+        always {
+          script {
+            // Capture the entire build log using sh command
+            def log = sh(script: 'cat /path/to/build.log', returnStdout: true)
+            def status = currentBuild.currentResult
+            mail to: 'baldhasmit@gmail.com',
+                 subject: "Security Scan: ${status}",
+                 body: "The Security Scan stage has ${status}. Logs are attached.",
+                 attachmentsPattern: 'log'
+          }
+        }
+      }
+    }
+    stage('Deploy to Staging') {
+      steps {
+        echo "Deployment Stage"
+      }
+    }
+    stage('Integration tests on Staging') {
+      steps {
+        echo "Integration Stage"
+      }
+    }
+    stage('Deploy to Production') {
+      steps {
+        echo "Production Stage"
+      }
+      post {
+        success {
+          mail to: 'baldhasmit@gmail.com',
+               subject: 'Deployment Successful',
+               body: 'The deployment was successful'
+        }
+      }
+    }
+  }
 }
