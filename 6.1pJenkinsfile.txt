@@ -75,3 +75,24 @@ pipeline {
         }
     }
 }
+
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Test Email') {
+            steps {
+                echo "Sending Test Email"
+            }
+        }
+    }
+    post {
+        always {
+            emailext to: 'baldhasmit@gmail.com',
+                     subject: "Test Pipeline",
+                     body: "This is a test email to ensure emailext works.",
+                     attachLog: true
+        }
+    }
+}
