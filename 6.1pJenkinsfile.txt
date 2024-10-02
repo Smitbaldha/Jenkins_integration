@@ -27,7 +27,7 @@ pipeline {
 
                 // Send the email with the log file attached
                 emailext(
-                    to: 'recipient@example.com',
+                    to: 'baldhasmit@gmail.com',
                     subject: "Build ${env.JOB_NAME} - ${env.BUILD_NUMBER} Results",
                     body: """Hi Team,
                              
