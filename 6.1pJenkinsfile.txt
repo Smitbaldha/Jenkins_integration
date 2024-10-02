@@ -36,7 +36,7 @@ pipeline {
                 // Send the email with the log file attached
                 def logFile = "build-log-${env.BUILD_NUMBER}.txt"
                 emailext(
-                    to: 'recipient@example.com',
+                    to: 'baldhasmit@gmail.com',
                     subject: "Build ${env.JOB_NAME} - ${env.BUILD_NUMBER} Results",
                     body: """Hi Team,
                              
