@@ -1,19 +1,31 @@
-
-
 pipeline {
     agent any
     
     stages {
         stage('Build') {
             steps {
-                echo 'Building...'
-                // Your build steps
+                script {
+                    // Create a log file to capture the build output
+                    def logFile = "build-log-${env.BUILD_NUMBER}.txt"
+                    // Redirect output to the log file
+                    sh "echo 'Building...' > ${logFile}"
+                    // Your build steps
+                    // Redirect all command outputs to the log file
+                    sh "echo 'Executing build steps...' >> ${logFile}"
+                    // Example build step
+                    sh "echo 'Build completed successfully.' >> ${logFile}"
+                }
             }
         }
         stage('Test') {
             steps {
-                echo 'Running tests...'
-                // Your test steps
+                script {
+                    // Append test output to the log file
+                    def logFile = "build-log-${env.BUILD_NUMBER}.txt"
+                    sh "echo 'Running tests...' >> ${logFile}"
+                    // Your test steps
+                    sh "echo 'Tests completed successfully.' >> ${logFile}"
+                }
             }
         }
     }
@@ -21,13 +33,10 @@ pipeline {
     post {
         always {
             script {
-                // Write the build log to a file
-                def logFile = "build-log-${env.BUILD_NUMBER}.txt"
-                sh "cat ${env.WORKSPACE}/log > ${logFile}"
-
                 // Send the email with the log file attached
+                def logFile = "build-log-${env.BUILD_NUMBER}.txt"
                 emailext(
-                    to: 'baldhasmit@gmail.com',
+                    to: 'recipient@example.com',
                     subject: "Build ${env.JOB_NAME} - ${env.BUILD_NUMBER} Results",
                     body: """Hi Team,
                              
@@ -42,4 +51,3 @@ pipeline {
         }
     }
 }
-
