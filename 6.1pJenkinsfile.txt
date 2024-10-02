@@ -76,9 +76,15 @@ pipeline {
             }
             post {
                 success {
-                    mail to: 'baldhasmit@gmail.com',
-                         subject: 'Deployment Successful',
-                         body: 'The deployment was successful'
+                    script {
+                        // Collect the full log of the pipeline
+                        def logContent = currentBuild.rawBuild.getLog(1000).join('\n') // Get last 1000 lines
+                        
+                        // Send an email with pipeline log
+                        mail to: 'baldhasmit@gmail.com',
+                             subject: 'Deployment Successful',
+                             body: "The deployment was successful.\n\nPipeline Log:\n${logContent}"
+                    }
                 }
             }
         }
