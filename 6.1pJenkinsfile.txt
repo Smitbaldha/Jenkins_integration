@@ -20,13 +20,21 @@ pipeline {
                 always {
                     script {
                         def status = currentBuild.currentResult
-                        def logFile = "unit_integration_tests.log"
+                        def logFile = "${env.WORKSPACE}/unit_integration_tests.log"  // Ensure correct path
                         
-                        // Send email with log file attached
-                        mail to: 'baldhasmit@gmail.com',
-                             subject: "Unit and Integration Tests: ${status}",
-                             body: "The Unit and Integration Tests stage has ${status}. Logs are attached.",
-                             attachmentsPattern: logFile
+                        echo "Checking for log file: ${logFile}"
+                        if (fileExists(logFile)) {
+                            try {
+                                emailext to: 'baldhasmit@gmail.com',
+                                         subject: "Unit and Integration Tests: ${status}",
+                                         body: "The Unit and Integration Tests stage has ${status}. Logs are attached.",
+                                         attachments: logFile  // Correct attachment usage
+                            } catch (Exception e) {
+                                echo "Failed to send email: ${e.message}"
+                            }
+                        } else {
+                            echo "Log file does not exist."
+                        }
                     }
                 }
             }
