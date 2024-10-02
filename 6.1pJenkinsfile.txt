@@ -9,32 +9,16 @@ pipeline {
         }
         stage('Unit and Integration Tests') {
             steps {
-                script {
-                    // Run tests and save logs
-                    sh """
-                    echo "Testing Stage" | tee unit_integration_tests.log
-                    """
-                }
+                echo "Running Unit and Integration Tests"
             }
             post {
                 always {
                     script {
                         def status = currentBuild.currentResult
-                        def logFile = "${env.WORKSPACE}/unit_integration_tests.log"  // Ensure correct path
-                        
-                        echo "Checking for log file: ${logFile}"
-                        if (fileExists(logFile)) {
-                            try {
-                                emailext to: 'baldhasmit@gmail.com',
-                                         subject: "Unit and Integration Tests: ${status}",
-                                         body: "The Unit and Integration Tests stage has ${status}. Logs are attached.",
-                                         attachments: logFile  // Correct attachment usage
-                            } catch (Exception e) {
-                                echo "Failed to send email: ${e.message}"
-                            }
-                        } else {
-                            echo "Log file does not exist."
-                        }
+                        emailext to: 'baldhasmit@gmail.com',
+                                 subject: "Unit and Integration Tests: ${status}",
+                                 body: "The Unit and Integration Tests stage has ${status}. Logs are attached.",
+                                 attachLog: true  // Attaches the console output log to the email
                     }
                 }
             }
@@ -46,24 +30,16 @@ pipeline {
         }
         stage('Security Scan') {
             steps {
-                script {
-                    // Run security scan and save logs
-                    sh """
-                    echo "Security Stage" | tee security_scan.log
-                    """
-                }
+                echo "Running Security Scan"
             }
             post {
                 always {
                     script {
                         def status = currentBuild.currentResult
-                        def logFile = "security_scan.log"
-                        
-                        // Send email with log file attached
-                        mail to: 'baldhasmit@gmail.com',
-                             subject: "Security Scan: ${status}",
-                             body: "The Security Scan stage has ${status}. Logs are attached.",
-                             attachmentsPattern: logFile
+                        emailext to: 'baldhasmit@gmail.com',
+                                 subject: "Security Scan: ${status}",
+                                 body: "The Security Scan stage has ${status}. Logs are attached.",
+                                 attachLog: true  // Attaches the console output log to the email
                     }
                 }
             }
@@ -73,34 +49,23 @@ pipeline {
                 echo "Deployment Stage"
             }
         }
-        stage('Integration tests on Staging') {
+        stage('Integration Tests on Staging') {
             steps {
-                echo "Integration Stage"
+                echo "Running Integration Tests on Staging"
             }
         }
         stage('Deploy to Production') {
             steps {
-                echo "Production Stage"
+                echo "Deploying to Production"
             }
             post {
                 always {
                     script {
                         def status = currentBuild.currentResult
-                        def logFile = "unit_integration_tests.log"
-                        
-                        // Check if log file exists before sending email
-                        if (fileExists(logFile)) {
-                            try {
-                                mail to: 'baldhasmit@gmail.com',
-                                     subject: "Unit and Integration Tests: ${status}",
-                                     body: "The Unit and Integration Tests stage has ${status}. Logs are attached.",
-                                     attachments: [logFile]  // Changed to attachments instead of attachmentsPattern
-                            } catch (Exception e) {
-                                echo "Failed to send email: ${e.message}"
-                            }
-                        } else {
-                            echo "Log file does not exist: ${logFile}"
-                        }
+                        emailext to: 'baldhasmit@gmail.com',
+                                 subject: "Deploy to Production: ${status}",
+                                 body: "The Production deployment has ${status}. Logs are attached.",
+                                 attachLog: true  // Attaches the console output log to the email
                     }
                 }
             }
