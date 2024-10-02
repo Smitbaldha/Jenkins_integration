@@ -1,51 +1,100 @@
 pipeline {
     agent any
-    
+
     stages {
         stage('Build') {
             steps {
                 script {
-                    // Create a log file to capture the build output
-                    def logFile = "build-log-${env.BUILD_NUMBER}.txt"
-                    // Redirect output to the log file
-                    sh "echo 'Building...' > ${logFile}"
-                    // Your build steps
-                    // Redirect all command outputs to the log file
-                    sh "echo 'Executing build steps...' >> ${logFile}"
-                    // Example build step
-                    sh "echo 'Build completed successfully.' >> ${logFile}"
+                    // Task: Build the code using a build automation tool
+                    // Tool: Maven
+                    echo 'Building the code using Maven...'
                 }
             }
         }
-        stage('Test') {
+
+        stage('Unit and Integration Tests') {
             steps {
                 script {
-                    // Append test output to the log file
-                    def logFile = "build-log-${env.BUILD_NUMBER}.txt"
-                    sh "echo 'Running tests...' >> ${logFile}"
-                    // Your test steps
-                    sh "echo 'Tests completed successfully.' >> ${logFile}"
+                    // Task: Run unit tests and integration tests
+                    // Tool: JUnit (for unit testing) and TestNG (for integration testing)
+                    echo 'Running unit tests using JUnit...'
+                    echo 'Running integration tests using TestNG...'
+                }
+            }
+        }
+
+        stage('Code Analysis') {
+            steps {
+                script {
+                    // Task: Analyze the code to ensure it meets industry standards
+                    // Tool: SonarQube
+                    echo 'Performing code analysis using SonarQube...'
+                }
+            }
+        }
+
+        stage('Security Scan') {
+            steps {
+                script {
+                    // Task: Perform a security scan on the code to identify vulnerabilities
+                    // Tool: OWASP ZAP
+                    echo 'Performing security scan using OWASP ZAP...'
+                }
+            }
+        }
+
+        stage('Deploy to Staging') {
+            steps {
+                script {
+                    // Task: Deploy the application to a staging server
+                    // Tool: AWS CLI (for deployment to AWS EC2 instance)
+                    echo 'Deploying the application to the staging server using AWS CLI...'
+                }
+            }
+        }
+
+        stage('Integration Tests on Staging') {
+            steps {
+                script {
+                    // Task: Run integration tests on the staging environment
+                    // Tool: Selenium (for testing web applications)
+                    echo 'Running integration tests on the staging environment using Selenium...'
+                }
+            }
+        }
+
+        stage('Deploy to Production') {
+            steps {
+                script {
+                    // Task: Deploy the application to a production server
+                    // Tool: AWS CLI (for deployment to AWS EC2 instance)
+                    echo 'Deploying the application to the production server using AWS CLI...'
                 }
             }
         }
     }
-    
+
     post {
         always {
             script {
-                // Send the email with the log file attached
-                def logFile = "build-log-${env.BUILD_NUMBER}.txt"
+                // Send email notifications after unit/integration tests and security scan stages
+                def testStatus = currentBuild.currentResult == 'SUCCESS' ? 'success' : 'failure'
+                def securityStatus = currentBuild.currentResult == 'SUCCESS' ? 'success' : 'failure'
+
                 emailext(
                     to: 'baldhasmit@gmail.com',
-                    subject: "Build ${env.JOB_NAME} - ${env.BUILD_NUMBER} Results",
-                    body: """Hi Team,
-                             
-                             The build has completed. Please find the attached build log.
-                             
-                             Regards,
-                             Jenkins""",
-                    attachmentsPattern: logFile,  // Attaching the log file
-                    recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+                    subject: "Unit and Integration Tests - ${testStatus}",
+                    body: "The unit and integration tests have completed with status: ${testStatus}.",
+                    attachmentsPattern: 'logs/*', // Update with actual logs path
+                    attachLog: true
+                )
+
+                emailext(
+                    to: 'baldhasmit@gmail.com',
+                    subject: "Security Scan - ${securityStatus}",
+                    body: "The security scan has completed with status: ${securityStatus}.",
+                    attachmentsPattern: 'logs/*', // Update with actual logs path
+                    attachLog: true
                 )
             }
         }
