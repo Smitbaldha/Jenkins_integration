@@ -17,8 +17,9 @@ pipeline {
                         def status = currentBuild.currentResult
                         emailext to: 'baldhasmit@gmail.com',
                                  subject: "Unit and Integration Tests: ${status}",
-                                 body: "The Unit and Integration Tests stage has ${status}. Logs are attached.",
-                                 attachLog: true  // Attaches the console output log to the email
+                                 body: """The Unit and Integration Tests stage has completed with status: ${status}. 
+                                          Please find the attached build logs.""",
+                                 attachLog: true  // Attach the full console log
                     }
                 }
             }
@@ -38,15 +39,16 @@ pipeline {
                         def status = currentBuild.currentResult
                         emailext to: 'baldhasmit@gmail.com',
                                  subject: "Security Scan: ${status}",
-                                 body: "The Security Scan stage has ${status}. Logs are attached.",
-                                 attachLog: true  // Attaches the console output log to the email
+                                 body: """The Security Scan stage has completed with status: ${status}. 
+                                          Logs are attached.""",
+                                 attachLog: true
                     }
                 }
             }
         }
         stage('Deploy to Staging') {
             steps {
-                echo "Deployment Stage"
+                echo "Deploying to Staging"
             }
         }
         stage('Integration Tests on Staging') {
@@ -64,8 +66,9 @@ pipeline {
                         def status = currentBuild.currentResult
                         emailext to: 'baldhasmit@gmail.com',
                                  subject: "Deploy to Production: ${status}",
-                                 body: "The Production deployment has ${status}. Logs are attached.",
-                                 attachLog: true  // Attaches the console output log to the email
+                                 body: """Production deployment has completed with status: ${status}. 
+                                          Logs are attached.""",
+                                 attachLog: true
                     }
                 }
             }
