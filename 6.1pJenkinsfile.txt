@@ -75,15 +75,24 @@ pipeline {
                 echo "Production Stage"
             }
             post {
-                success {
+                always {
                     script {
-                        // Collect the full log of the pipeline
-                        def logContent = currentBuild.rawBuild.getLog(1000).join('\n') // Get last 1000 lines
+                        def status = currentBuild.currentResult
+                        def logFile = "unit_integration_tests.log"
                         
-                        // Send an email with pipeline log
-                        mail to: 'baldhasmit@gmail.com',
-                             subject: 'Deployment Successful',
-                             body: "The deployment was successful.\n\nPipeline Log:\n${logContent}"
+                        // Check if log file exists before sending email
+                        if (fileExists(logFile)) {
+                            try {
+                                mail to: 'baldhasmit@gmail.com',
+                                     subject: "Unit and Integration Tests: ${status}",
+                                     body: "The Unit and Integration Tests stage has ${status}. Logs are attached.",
+                                     attachments: [logFile]  // Changed to attachments instead of attachmentsPattern
+                            } catch (Exception e) {
+                                echo "Failed to send email: ${e.message}"
+                            }
+                        } else {
+                            echo "Log file does not exist: ${logFile}"
+                        }
                     }
                 }
             }
