@@ -15,7 +15,7 @@ pipeline {
                 always {
                     script {
                         def status = currentBuild.currentResult
-                        emailext to: 'baldhasmit@gmail.com',
+                        mail to: 'baldhasmit@gmail.com',
                                  subject: "Unit and Integration Tests: ${status}",
                                  body: """The Unit and Integration Tests stage has completed with status: ${status}. 
                                           Please find the attached build logs.""",
@@ -37,7 +37,7 @@ pipeline {
                 always {
                     script {
                         def status = currentBuild.currentResult
-                        emailext to: 'baldhasmit@gmail.com',
+                        mail to: 'baldhasmit@gmail.com',
                                  subject: "Security Scan: ${status}",
                                  body: """The Security Scan stage has completed with status: ${status}. 
                                           Logs are attached.""",
@@ -64,7 +64,7 @@ pipeline {
                 always {
                     script {
                         def status = currentBuild.currentResult
-                        emailext to: 'baldhasmit@gmail.com',
+                        mail to: 'baldhasmit@gmail.com',
                                  subject: "Deploy to Production: ${status}",
                                  body: """Production deployment has completed with status: ${status}. 
                                           Logs are attached.""",
@@ -72,27 +72,6 @@ pipeline {
                     }
                 }
             }
-        }
-    }
-}
-
-
-pipeline {
-    agent any
-
-    stages {
-        stage('Test Email') {
-            steps {
-                echo "Sending Test Email"
-            }
-        }
-    }
-    post {
-        always {
-            emailext to: 'baldhasmit@gmail.com',
-                     subject: "Test Pipeline",
-                     body: "This is a test email to ensure emailext works.",
-                     attachLog: true
         }
     }
 }
