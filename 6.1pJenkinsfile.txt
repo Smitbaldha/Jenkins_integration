@@ -1,77 +1,45 @@
+
+
 pipeline {
     agent any
-
+    
     stages {
         stage('Build') {
             steps {
-                echo "Build Stage"
+                echo 'Building...'
+                // Your build steps
             }
         }
-        stage('Unit and Integration Tests') {
+        stage('Test') {
             steps {
-                echo "Running Unit and Integration Tests"
-            }
-            post {
-                always {
-                    script {
-                        def status = currentBuild.currentResult
-                        mail to: 'baldhasmit@gmail.com',
-                                 subject: "Unit and Integration Tests: ${status}",
-                                 body: """The Unit and Integration Tests stage has completed with status: ${status}. 
-                                          Please find the attached build logs.""",
-                                 attachLog: true  // Attach the full console log
-                    }
-                }
+                echo 'Running tests...'
+                // Your test steps
             }
         }
-        stage('Code Analysis') {
-            steps {
-                echo "Code Analysis Stage"
-            }
-        }
-        stage('Security Scan') {
-            steps {
-                echo "Running Security Scan"
-            }
-            post {
-                always {
-                    script {
-                        def status = currentBuild.currentResult
-                        mail to: 'baldhasmit@gmail.com',
-                                 subject: "Security Scan: ${status}",
-                                 body: """The Security Scan stage has completed with status: ${status}. 
-                                          Logs are attached.""",
-                                 attachLog: true
-                    }
-                }
-            }
-        }
-        stage('Deploy to Staging') {
-            steps {
-                echo "Deploying to Staging"
-            }
-        }
-        stage('Integration Tests on Staging') {
-            steps {
-                echo "Running Integration Tests on Staging"
-            }
-        }
-        stage('Deploy to Production') {
-            steps {
-                echo "Deploying to Production"
-            }
-            post {
-                always {
-                    script {
-                        def status = currentBuild.currentResult
-                        mail to: 'baldhasmit@gmail.com',
-                                 subject: "Deploy to Production: ${status}",
-                                 body: """Production deployment has completed with status: ${status}. 
-                                          Logs are attached.""",
-                                 attachLog: true
-                    }
-                }
+    }
+    
+    post {
+        always {
+            script {
+                // Write the build log to a file
+                def logFile = "build-log-${env.BUILD_NUMBER}.txt"
+                sh "cat ${env.WORKSPACE}/log > ${logFile}"
+
+                // Send the email with the log file attached
+                emailext(
+                    to: 'recipient@example.com',
+                    subject: "Build ${env.JOB_NAME} - ${env.BUILD_NUMBER} Results",
+                    body: """Hi Team,
+                             
+                             The build has completed. Please find the attached build log.
+                             
+                             Regards,
+                             Jenkins""",
+                    attachmentsPattern: logFile,  // Attaching the log file
+                    recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+                )
             }
         }
     }
 }
+
