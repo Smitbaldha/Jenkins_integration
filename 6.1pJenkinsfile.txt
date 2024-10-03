@@ -81,7 +81,7 @@ pipeline {
                 def testStatus = currentBuild.currentResult == 'SUCCESS' ? 'success' : 'failure'
                 def securityStatus = currentBuild.currentResult == 'SUCCESS' ? 'success' : 'failure'
 
-                if (testStatus == 'failure') {
+                if (testStatus == 'success') {
                     emailext(
                         to: 'your_email@example.com',
                         subject: "Unit and Integration Tests - ${testStatus}",
@@ -91,7 +91,7 @@ pipeline {
                     )
                 }
 
-                if (securityStatus == 'failure') {
+                if (securityStatus == 'success') {
                     emailext(
                         to: 'your_email@example.com',
                         subject: "Security Scan - ${securityStatus}",
