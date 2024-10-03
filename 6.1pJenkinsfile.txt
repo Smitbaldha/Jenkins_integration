@@ -96,6 +96,21 @@ pipeline {
 
     post {
         always {
+            escript {
+                // Get the current build status
+                def buildStatus = currentBuild.currentResult ?: 'SUCCESS' // Default to SUCCESS if not set
+                
+                // Set email subject and body based on the build status
+                def emailSubject = "Pipeline Execution Result: ${buildStatus}"
+                def emailBody = "The pipeline has completed with status: ${buildStatus}. The logs are attached."
+
+                // Send email notification
+                emailext(
+                    to: 'baldhasmit@gmail.com',
+                    subject: emailSubject,
+                    body: emailBody,
+                    attachLog: true
+                )
             cleanWs()  // Optionally clean workspace after pipeline completion
         }
     }
