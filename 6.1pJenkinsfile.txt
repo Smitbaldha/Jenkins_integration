@@ -7,82 +7,103 @@ pipeline {
                 echo "Build Stage"
             }
         }
+
         stage('Unit and Integration Tests') {
             steps {
-                script {
-                    // Run tests and save logs
-                    echo "Running Unit and Integration Tests" | tee unit_integration_tests.log
-                }
+                echo "Running Unit and Integration Tests"
+                sh "echo 'Unit and Integration Test logs' > unit_integration_tests.log"  // Simulating log creation
             }
             post {
                 always {
                     script {
                         def status = currentBuild.currentResult
-                        
-                        // Archive the log file for the workspace
-                        archiveArtifacts artifacts: logFile, fingerprint: true
-
-                        // Send email with log file attached
+                        archiveArtifacts artifacts: 'unit_integration_tests.log', allowEmptyArchive: true
                         mail to: 'baldhasmit@gmail.com',
                              subject: "Unit and Integration Tests: ${status}",
-                             body: "The Unit and Integration Tests stage has completed with status: ${status}. Logs are attached.",
-                             attachLog: true
+                             body: """The Unit and Integration Tests stage has completed with status: ${status}.
+                                      Logs are attached.""",
+                             attachLog: true  // Attach the full console log
                     }
                 }
             }
         }
+
         stage('Code Analysis') {
             steps {
-                echo "Code Analysis Stage"
-            }
-        }
-        stage('Security Scan') {
-            steps {
-                script {
-                    // Run security scan and save logs
-                    echo "Running Security Scan" | tee security_scan.log
-                }
+                echo "Running Code Analysis"
             }
             post {
                 always {
                     script {
                         def status = currentBuild.currentResult
-                        
-                        // Archive the log file for the workspace
-                        archiveArtifacts artifacts: logFile, fingerprint: true
-
-                        // Send email with log file attached
                         mail to: 'baldhasmit@gmail.com',
-                             subject: "Security Scan: ${status}",
-                             body: "The Security Scan stage has completed with status: ${status}. Logs are attached.",
+                             subject: "Code Analysis: ${status}",
+                             body: """The Code Analysis stage has completed with status: ${status}.
+                                      Logs are attached.""",
                              attachLog: true
                     }
                 }
             }
         }
+
+        stage('Security Scan') {
+            steps {
+                echo "Running Security Scan"
+                sh "echo 'Security scan logs' > security_scan.log"  // Simulating log creation
+            }
+            post {
+                always {
+                    script {
+                        def status = currentBuild.currentResult
+                        archiveArtifacts artifacts: 'security_scan.log', allowEmptyArchive: true
+                        mail to: 'baldhasmit@gmail.com',
+                             subject: "Security Scan: ${status}",
+                             body: """The Security Scan stage has completed with status: ${status}.
+                                      Logs are attached.""",
+                             attachLog: true
+                    }
+                }
+            }
+        }
+
         stage('Deploy to Staging') {
             steps {
                 echo "Deploying to Staging"
             }
         }
+
         stage('Integration Tests on Staging') {
             steps {
                 echo "Running Integration Tests on Staging"
             }
         }
+
         stage('Deploy to Production') {
             steps {
                 echo "Deploying to Production"
             }
             post {
-                always {
+                success {
                     script {
                         def status = currentBuild.currentResult
+                        def logContent = currentBuild.rawBuild.getLog(1000).join('\n') // Get last 1000 lines of logs
                         mail to: 'baldhasmit@gmail.com',
-                             subject: "Deploy to Production: ${status}",
-                             body: "Production deployment has completed with status: ${status}. Logs for previous stages are attached."
+                             subject: "Deployment Successful",
+                             body: """The deployment was successful with status: ${status}.
+                                      \n\nPipeline Log:\n${logContent}"""
                     }
                 }
+            }
+        }
+    }
+
+    post {
+        failure {
+            script {
+                mail to: 'baldhasmit@gmail.com',
+                     subject: "Pipeline Failed: ${currentBuild.fullDisplayName}",
+                     body: "The pipeline has failed. Check the Jenkins logs for details.",
+                     attachLog: true
             }
         }
     }
