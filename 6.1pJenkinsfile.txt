@@ -27,7 +27,7 @@ pipeline {
                         mail to: 'baldhasmit@gmail.com',
                              subject: "Unit and Integration Tests: ${status}",
                              body: "The Unit and Integration Tests stage has completed with status: ${status}. Logs are attached.",
-                             attachmentsPattern: logFile 
+                             attachments: logFile 
                     }
                 }
             }
@@ -57,7 +57,7 @@ pipeline {
                         mail to: 'baldhasmit@gmail.com',
                              subject: "Security Scan: ${status}",
                              body: "The Security Scan stage has completed with status: ${status}. Logs are attached.",
-                             attachmentsPattern: logFile
+                             attachments: logFile
                     }
                 }
             }
