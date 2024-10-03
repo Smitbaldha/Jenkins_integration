@@ -83,7 +83,7 @@ pipeline {
 
                 if (testStatus == 'success') {
                     emailext(
-                        to: 'your_email@example.com',
+                        to: 'baldhasmit@gmail.com',
                         subject: "Unit and Integration Tests - ${testStatus}",
                         body: "The unit and integration tests have completed with status: ${testStatus}.",
                         attachmentsPattern: 'logs/*', // Update with actual logs path
@@ -93,7 +93,7 @@ pipeline {
 
                 if (securityStatus == 'success') {
                     emailext(
-                        to: 'your_email@example.com',
+                        to: 'baldhasmit@gmail.com',
                         subject: "Security Scan - ${securityStatus}",
                         body: "The security scan has completed with status: ${securityStatus}.",
                         attachmentsPattern: 'logs/*', // Update with actual logs path
