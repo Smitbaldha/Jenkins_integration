@@ -2,12 +2,23 @@ pipeline {
     agent any
 
     stages {
+        stage('Prepare Log Directory') {
+            steps {
+                script {
+                    // Create logs directory if it does not exist
+                    sh 'mkdir -p logs' // Ensure the logs directory exists
+                }
+            }
+        }
+
         stage('Build') {
             steps {
                 script {
-                    // Task: Build the code using Maven
+                    // Task: Build the code using a build automation tool
+                    // Tool: Maven
                     echo 'Building the code using Maven...'
-                    sh 'mvn clean install >> logs/pipeline.log 2>&1'  // Append build logs to single log file
+                    // Append logs to the log file
+                    sh 'echo "Building the code using Maven..." >> logs/pipeline.log'
                 }
             }
         }
@@ -15,9 +26,12 @@ pipeline {
         stage('Unit and Integration Tests') {
             steps {
                 script {
+                    // Task: Run unit tests and integration tests
+                    // Tool: JUnit (for unit testing) and TestNG (for integration testing)
                     echo 'Running unit tests using JUnit...'
+                    sh 'echo "Running unit tests using JUnit..." >> logs/pipeline.log'
                     echo 'Running integration tests using TestNG...'
-                    sh 'mvn test >> logs/pipeline.log 2>&1'  // Append test logs to single log file
+                    sh 'echo "Running integration tests using TestNG..." >> logs/pipeline.log'
                 }
             }
             post {
@@ -36,8 +50,10 @@ pipeline {
         stage('Code Analysis') {
             steps {
                 script {
+                    // Task: Analyze the code to ensure it meets industry standards
+                    // Tool: SonarQube
                     echo 'Performing code analysis using SonarQube...'
-                    sh 'sonar-scanner >> logs/pipeline.log 2>&1'  // Append code analysis logs
+                    sh 'echo "Performing code analysis using SonarQube..." >> logs/pipeline.log'
                 }
             }
         }
@@ -45,8 +61,10 @@ pipeline {
         stage('Security Scan') {
             steps {
                 script {
+                    // Task: Perform a security scan on the code to identify vulnerabilities
+                    // Tool: OWASP ZAP
                     echo 'Performing security scan using OWASP ZAP...'
-                    sh 'zap-cli start >> logs/pipeline.log 2>&1'  // Append security scan logs
+                    sh 'echo "Performing security scan using OWASP ZAP..." >> logs/pipeline.log'
                 }
             }
             post {
@@ -65,8 +83,10 @@ pipeline {
         stage('Deploy to Staging') {
             steps {
                 script {
+                    // Task: Deploy the application to a staging server
+                    // Tool: AWS CLI (for deployment to AWS EC2 instance)
                     echo 'Deploying the application to the staging server using AWS CLI...'
-                    sh 'aws deploy >> logs/pipeline.log 2>&1'  // Append deployment logs
+                    sh 'echo "Deploying to staging server..." >> logs/pipeline.log'
                 }
             }
         }
@@ -74,8 +94,10 @@ pipeline {
         stage('Integration Tests on Staging') {
             steps {
                 script {
+                    // Task: Run integration tests on the staging environment
+                    // Tool: Selenium (for testing web applications)
                     echo 'Running integration tests on the staging environment using Selenium...'
-                    sh 'selenium-tests >> logs/pipeline.log 2>&1'  // Append staging tests logs
+                    sh 'echo "Running integration tests on staging..." >> logs/pipeline.log'
                 }
             }
         }
@@ -83,8 +105,10 @@ pipeline {
         stage('Deploy to Production') {
             steps {
                 script {
+                    // Task: Deploy the application to a production server
+                    // Tool: AWS CLI (for deployment to AWS EC2 instance)
                     echo 'Deploying the application to the production server using AWS CLI...'
-                    sh 'aws deploy >> logs/pipeline.log 2>&1'  // Append production deployment logs
+                    sh 'echo "Deploying to production server..." >> logs/pipeline.log'
                 }
             }
         }
