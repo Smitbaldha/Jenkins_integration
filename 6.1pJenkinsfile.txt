@@ -111,7 +111,9 @@ pipeline {
                     body: emailBody,
                     attachLog: true
                 )
-            cleanWs()  // Optionally clean workspace after pipeline completion
+            
+                cleanWs()  // Optionally clean workspace after pipeline completion
+            }
         }
     }
 }
