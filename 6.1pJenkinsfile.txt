@@ -96,7 +96,7 @@ pipeline {
 
     post {
         always {
-            escript {
+            script {
                 // Get the current build status
                 def buildStatus = currentBuild.currentResult ?: 'SUCCESS' // Default to SUCCESS if not set
                 
