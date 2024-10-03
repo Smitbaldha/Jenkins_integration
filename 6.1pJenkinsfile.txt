@@ -4,106 +4,102 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                echo "Build Stage"
+                script {
+                    // Task: Build the code using a build automation tool
+                    // Tool: Maven
+                    echo 'Building the code using Maven...'
+                }
             }
         }
 
         stage('Unit and Integration Tests') {
             steps {
-                echo "Running Unit and Integration Tests"
-                sh "echo 'Unit and Integration Test logs' > unit_integration_tests.log"  // Simulating log creation
-            }
-            post {
-                always {
-                    script {
-                        def status = currentBuild.currentResult
-                        archiveArtifacts artifacts: 'unit_integration_tests.log', allowEmptyArchive: true
-                        mail to: 'baldhasmit@gmail.com',
-                             subject: "Unit and Integration Tests: ${status}",
-                             body: """The Unit and Integration Tests stage has completed with status: ${status}.
-                                      Logs are attached.""",
-                             attachLog: true  // Attach the full console log
-                    }
+                script {
+                    // Task: Run unit tests and integration tests
+                    // Tool: JUnit (for unit testing) and TestNG (for integration testing)
+                    echo 'Running unit tests using JUnit...'
+                    echo 'Running integration tests using TestNG...'
                 }
             }
         }
 
         stage('Code Analysis') {
             steps {
-                echo "Running Code Analysis"
-            }
-            post {
-                always {
-                    script {
-                        def status = currentBuild.currentResult
-                        mail to: 'baldhasmit@gmail.com',
-                             subject: "Code Analysis: ${status}",
-                             body: """The Code Analysis stage has completed with status: ${status}.
-                                      Logs are attached.""",
-                             attachLog: true
-                    }
+                script {
+                    // Task: Analyze the code to ensure it meets industry standards
+                    // Tool: SonarQube
+                    echo 'Performing code analysis using SonarQube...'
                 }
             }
         }
 
         stage('Security Scan') {
             steps {
-                echo "Running Security Scan"
-                sh "echo 'Security scan logs' > security_scan.log"  // Simulating log creation
-            }
-            post {
-                always {
-                    script {
-                        def status = currentBuild.currentResult
-                        archiveArtifacts artifacts: 'security_scan.log', allowEmptyArchive: true
-                        mail to: 'baldhasmit@gmail.com',
-                             subject: "Security Scan: ${status}",
-                             body: """The Security Scan stage has completed with status: ${status}.
-                                      Logs are attached.""",
-                             attachLog: true
-                    }
+                script {
+                    // Task: Perform a security scan on the code to identify vulnerabilities
+                    // Tool: OWASP ZAP
+                    echo 'Performing security scan using OWASP ZAP...'
                 }
             }
         }
 
         stage('Deploy to Staging') {
             steps {
-                echo "Deploying to Staging"
+                script {
+                    // Task: Deploy the application to a staging server
+                    // Tool: AWS CLI (for deployment to AWS EC2 instance)
+                    echo 'Deploying the application to the staging server using AWS CLI...'
+                }
             }
         }
 
         stage('Integration Tests on Staging') {
             steps {
-                echo "Running Integration Tests on Staging"
+                script {
+                    // Task: Run integration tests on the staging environment
+                    // Tool: Selenium (for testing web applications)
+                    echo 'Running integration tests on the staging environment using Selenium...'
+                }
             }
         }
 
         stage('Deploy to Production') {
             steps {
-                echo "Deploying to Production"
-            }
-            post {
-                success {
-                    script {
-                        def status = currentBuild.currentResult
-                        def logContent = currentBuild.rawBuild.getLog(1000).join('\n') // Get last 1000 lines of logs
-                        mail to: 'baldhasmit@gmail.com',
-                             subject: "Deployment Successful",
-                             body: """The deployment was successful with status: ${status}.
-                                      \n\nPipeline Log:\n${logContent}"""
-                    }
+                script {
+                    // Task: Deploy the application to a production server
+                    // Tool: AWS CLI (for deployment to AWS EC2 instance)
+                    echo 'Deploying the application to the production server using AWS CLI...'
                 }
             }
         }
     }
 
     post {
-        failure {
+        always {
             script {
-                mail to: 'baldhasmit@gmail.com',
-                     subject: "Pipeline Failed: ${currentBuild.fullDisplayName}",
-                     body: "The pipeline has failed. Check the Jenkins logs for details.",
-                     attachLog: true
+                // Send email notifications after test and security scan stages
+                def testStatus = currentBuild.currentResult == 'SUCCESS' ? 'success' : 'failure'
+                def securityStatus = currentBuild.currentResult == 'SUCCESS' ? 'success' : 'failure'
+
+                if (testStatus == 'failure') {
+                    emailext(
+                        to: 'your_email@example.com',
+                        subject: "Unit and Integration Tests - ${testStatus}",
+                        body: "The unit and integration tests have completed with status: ${testStatus}.",
+                        attachmentsPattern: 'logs/*', // Update with actual logs path
+                        attachLog: true
+                    )
+                }
+
+                if (securityStatus == 'failure') {
+                    emailext(
+                        to: 'your_email@example.com',
+                        subject: "Security Scan - ${securityStatus}",
+                        body: "The security scan has completed with status: ${securityStatus}.",
+                        attachmentsPattern: 'logs/*', // Update with actual logs path
+                        attachLog: true
+                    )
+                }
             }
         }
     }
